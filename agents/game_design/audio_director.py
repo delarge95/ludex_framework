@@ -15,6 +15,7 @@ from core.agent_utils import safe_agent_invoke
 from config.settings import settings
 from schemas.audio_design_schema import AudioDesignSchema
 from tools.domain_knowledge_tool import DomainKnowledgeTool
+from core.agent_synergies import extract_mechanics_audio_triggers, inject_synergy_context
 
 logger = structlog.get_logger(__name__)
 
@@ -35,10 +36,23 @@ async def audio_director_node(state: GameDesignState) -> GameDesignState:
         narrative = state.get("narrative_structure", {})
         art_direction = state.get("art_direction", {})
         
-        system_msg = SystemMessage(content="""You are a **Lead Audio Director** for games.
+        # SYNERGY: Extract audio triggers from MechanicsDesigner
+        mechanics = state.get("mechanics", [])
+        audio_triggers = extract_mechanics_audio_triggers(mechanics)
+        
+        base_system_prompt = """You are a **Lead Audio Director** for games.
 Design immersive audio that enhances atmosphere, gameplay, and narrative.
 You have access to a 'domain_knowledge_tool'. USE IT to research specific audio techniques, middleware capabilities (Wwise/FMOD), or genre-specific music patterns before making decisions.
-Return a structured audio design plan.""")
+Return a structured audio design plan."""
+        
+        # SYNERGY: Inject mechanics audio triggers into prompt
+        enhanced_prompt = inject_synergy_context(
+            base_system_prompt,
+            {"triggers": audio_triggers},
+            "mechanics_audio"
+        )
+        
+        system_msg = SystemMessage(content=enhanced_prompt)
         
         human_msg = HumanMessage(content=f"""Design audio system for:
 **Narrative Tone**: {narrative.get('tone', 'Unknown')}

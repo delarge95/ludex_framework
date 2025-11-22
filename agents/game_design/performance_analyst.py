@@ -13,6 +13,7 @@ from core.state import GameDesignState
 from core.model_factory import create_model
 from core.agent_utils import safe_agent_invoke
 from config.settings import settings
+from core.agent_synergies import extract_art_performance_budgets, inject_synergy_context
 
 logger = structlog.get_logger(__name__)
 
@@ -33,7 +34,11 @@ async def performance_analyst_node(state: GameDesignState) -> GameDesignState:
         technical_stack = state.get("technical_stack", {})
         target_platforms = state.get("target_platforms", [])
         
-        system_msg = SystemMessage(content="""You are a **Lead Performance Analyst** for games.
+        # SYNERGY: Extract performance budgets from ArtDirector
+        art_style_guide = state.get("art_style_guide", {})
+        performance_budgets = extract_art_performance_budgets(art_style_guide)
+        
+        base_system_prompt = """You are a **Lead Performance Analyst** for games.
 
 Define realistic performance targets and optimization strategies.
 
@@ -124,7 +129,16 @@ Output JSON:
     }
   }
 }
-```""")
+```"""
+        
+        # SYNERGY: Inject art performance budgets into prompt
+        enhanced_prompt = inject_synergy_context(
+            base_system_prompt,
+            performance_budgets,
+            "art_performance"
+        )
+        
+        system_msg = SystemMessage(content=enhanced_prompt)
         
         human_msg = HumanMessage(content=f"""Define performance targets for:
 **Engine**: {technical_stack.get('engine', 'Unity')}

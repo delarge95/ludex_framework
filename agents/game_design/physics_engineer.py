@@ -13,6 +13,7 @@ from core.state import GameDesignState
 from core.model_factory import create_model
 from core.agent_utils import safe_agent_invoke
 from config.settings import settings
+from core.agent_synergies import extract_world_physics_constants, inject_synergy_context
 
 logger = structlog.get_logger(__name__)
 
@@ -33,7 +34,11 @@ async def physics_engineer_node(state: GameDesignState) -> GameDesignState:
         mechanics = state.get("mechanics", [])
         technical_stack = state.get("technical_stack", {})
         
-        system_msg = SystemMessage(content="""You are a **Lead Physics Engineer** for games.
+        # SYNERGY: Extract world physics constants from WorldBuilder
+        world_lore = state.get("world_lore", {})
+        physics_constants = extract_world_physics_constants(world_lore)
+        
+        base_system_prompt = """You are a **Lead Physics Engineer** for games.
 
 Design physics systems that enhance gameplay while maintaining performance.
 
@@ -87,7 +92,16 @@ Output JSON:
     "max_collision_checks_per_frame": 500
   }
 }
-```""")
+```"""
+        
+        # SYNERGY: Inject world physics constants into prompt
+        enhanced_prompt = inject_synergy_context(
+            base_system_prompt,
+            physics_constants,
+            "world_physics"
+        )
+        
+        system_msg = SystemMessage(content=enhanced_prompt)
         
         human_msg = HumanMessage(content=f"""Design physics system for:
 **Mechanics**: {mechanics}
