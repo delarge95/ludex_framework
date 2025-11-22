@@ -1,0 +1,22 @@
+[18:09:28] === INICIO TEST E2E CON MONITOREO ===
+[18:09:28] Niche: Rust WebAssembly for real-time audio processing
+[18:09:28] Duracion estimada: 53-63 minutos
+[18:09:28] Monitoreo: Alertas cada 3 min sin actividad
+
+[18:09:28] Monitor de cuelgues iniciado (alerta cada 3 min)
+
+[18:09:28] [1/6] Iniciando run_analysis_sync()...
+[18:09:28]       (Este paso puede tardar 2-5 min en iniciar)
+[18:11:11] 
+[3/6] Crew finalizado en 1.7 minutos
+[18:11:11] 
+!!! ERROR INESPERADO !!!
+[18:11:11] Tipo: TypeError
+[18:11:11] Mensaje: 'PipelineResult' object is not subscriptable
+[18:11:11] 
+Traceback completo:
+[18:11:11] Traceback (most recent call last):
+  File "D:\Downloads\TRABAJO_DE_GRADO\ara_framework\test_monitored_realtime.py", line 81, in run_test
+    log_activity(f"[4/6] Status: {result['status']}")
+                                  ~~~~~~^^^^^^^^^^
+TypeError: 'PipelineResult' object is not subscriptable

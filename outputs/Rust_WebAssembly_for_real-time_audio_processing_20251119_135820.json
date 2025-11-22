@@ -1,0 +1,17 @@
+{
+  "niche": "Rust WebAssembly for real-time audio processing",
+  "status": "partial",
+  "final_report": null,
+  "start_time": "2025-11-19T18:58:19.960552+00:00",
+  "end_time": "2025-11-19T18:58:20.962075+00:00",
+  "duration_seconds": 1.001523,
+  "total_credits_used": 0.0,
+  "agent_results": [],
+  "supabase_saved": false,
+  "supabase_record_id": null,
+  "local_backup_path": null,
+  "errors": [
+    "Graph execution failed: Checkpointer requires one or more of the following 'configurable' keys: thread_id, checkpoint_ns, checkpoint_id"
+  ],
+  "warnings": []
+}

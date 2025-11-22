@@ -1,0 +1,12 @@
+[17:54:41] C:\Users\alexw\AppData\Roaming\Python\Python314\site-packages\langchain_core\_api\deprecation.py:26: UserWarning: Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.
+[17:54:41]   from pydantic.v1.fields import FieldInfo as FieldInfoV1
+[17:54:42] Traceback (most recent call last):
+[17:54:42]   File "D:\Downloads\TRABAJO_DE_GRADO\ara_framework\test_simple.py", line 8, in <module>
+[17:54:42]     from core.pipeline import AnalysisPipeline
+[17:54:42]   File "d:\Downloads\TRABAJO_DE_GRADO\ara_framework\core\pipeline.py", line 43, in <module>
+[17:54:42]     from crewai import Crew, Process, Agent, Task
+[17:54:42]   File "C:\Users\alexw\AppData\Roaming\Python\Python314\site-packages\crewai\__init__.py", line 1, in <module>
+[17:54:42]     from crewai.agent import Agent
+[17:54:42]   File "C:\Users\alexw\AppData\Roaming\Python\Python314\site-packages\crewai\agent.py", line 5, in <module>
+[17:54:42]     from langchain.agents.agent import RunnableAgent
+[17:54:42] ModuleNotFoundError: No module named 'langchain.agents.agent'

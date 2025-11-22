@@ -1,0 +1,17 @@
+{
+  "niche": "Rust WASM for real-time audio processing",
+  "status": "partial",
+  "final_report": null,
+  "start_time": "2025-11-19T22:36:49.171448+00:00",
+  "end_time": "2025-11-19T22:36:49.267895+00:00",
+  "duration_seconds": 0.096447,
+  "total_credits_used": 0.0,
+  "agent_results": [],
+  "supabase_saved": false,
+  "supabase_record_id": null,
+  "local_backup_path": null,
+  "errors": [
+    "Graph execution failed: AnalysisPipeline._run_graph_with_circuit_breaker() takes 3 positional arguments but 4 were given"
+  ],
+  "warnings": []
+}

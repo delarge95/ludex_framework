@@ -1,0 +1,17 @@
+{
+  "niche": "Rust WASM for audio processing",
+  "status": "partial",
+  "final_report": null,
+  "start_time": "2025-11-07T07:36:07.787950+00:00",
+  "end_time": "2025-11-07T07:38:45.489720+00:00",
+  "duration_seconds": 157.70177,
+  "total_credits_used": 0.0,
+  "agent_results": [],
+  "supabase_saved": false,
+  "supabase_record_id": null,
+  "local_backup_path": null,
+  "errors": [
+    "Crew execution failed: Error interpolating expected_output: \"Template variable 'id' not found in inputs dictionary\""
+  ],
+  "warnings": []
+}

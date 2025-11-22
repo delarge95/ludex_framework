@@ -1,0 +1,19 @@
+[18:08:06] === INICIO TEST E2E CON MONITOREO ===
+[18:08:06] Niche: Rust WebAssembly for real-time audio processing
+[18:08:06] Duracion estimada: 53-63 minutos
+[18:08:06] Monitoreo: Alertas cada 3 min sin actividad
+
+[18:08:06] Monitor de cuelgues iniciado (alerta cada 3 min)
+
+[18:08:06] [1/6] Creando pipeline...
+[18:08:06] 
+!!! ERROR INESPERADO !!!
+[18:08:06] Tipo: TypeError
+[18:08:06] Mensaje: AnalysisPipeline.__init__() got an unexpected keyword argument 'niche'
+[18:08:06] 
+Traceback completo:
+[18:08:06] Traceback (most recent call last):
+  File "D:\Downloads\TRABAJO_DE_GRADO\ara_framework\test_monitored_realtime.py", line 72, in run_test
+    pipeline = AnalysisPipeline(
+               ^^^^^^^^^^^^^^^^^
+TypeError: AnalysisPipeline.__init__() got an unexpected keyword argument 'niche'

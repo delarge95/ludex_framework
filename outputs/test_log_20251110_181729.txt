@@ -1,0 +1,23 @@
+[18:15:55] === INICIO TEST E2E CON MONITOREO ===
+[18:15:55] Niche: Rust WebAssembly for real-time audio processing
+[18:15:55] Duracion estimada: 53-63 minutos
+[18:15:55] Monitoreo: Alertas cada 3 min sin actividad
+
+[18:15:55] Monitor de cuelgues iniciado (alerta cada 3 min)
+
+[18:15:55] [1/6] Iniciando run_analysis_sync()...
+[18:15:55]       (Este paso puede tardar 2-5 min en iniciar)
+[18:17:29] 
+[3/6] Crew finalizado en 1.6 minutos
+[18:17:29] [4/6] Status: PipelineStatus.PARTIAL
+[18:17:29] 
+!!! ERROR INESPERADO !!!
+[18:17:29] Tipo: AttributeError
+[18:17:29] Mensaje: 'PipelineResult' object has no attribute 'credits_used'
+[18:17:29] 
+Traceback completo:
+[18:17:29] Traceback (most recent call last):
+  File "D:\Downloads\TRABAJO_DE_GRADO\ara_framework\test_monitored_realtime.py", line 82, in run_test
+    log_activity(f"[5/6] Creditos usados: {result.credits_used}")
+                                           ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'PipelineResult' object has no attribute 'credits_used'
