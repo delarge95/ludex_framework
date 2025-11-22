@@ -11,6 +11,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from core.state import GameDesignState
 from core.model_factory import create_model
 from core.agent_utils import safe_agent_invoke
+from core.agent_synergies import extract_narrative_world_themes, inject_synergy_context
 from config.settings import settings
 
 logger = structlog.get_logger(__name__)
@@ -33,7 +34,10 @@ async def world_builder_node(state: GameDesignState) -> GameDesignState:
         genre = state.get("genre", "Unknown")
         narrative = state.get("narrative_structure", {})
         
-        system_msg = SystemMessage(content="""You are a **World Builder** who creates immersive game worlds.
+        # SYNERGY: Extract narrative themes from NarrativeArchitect
+        themes = extract_narrative_world_themes(narrative)
+        
+        base_prompt = """You are a **World Builder** who creates immersive game worlds.
 
 Output JSON:
 ```json
@@ -54,7 +58,10 @@ Output JSON:
   },
   "environmental_storytelling": ["Idea 1", "Idea 2"]
 }
-```""")
+```"""
+        
+        # SYNERGY: Inject narrative context into prompt
+        system_msg = SystemMessage(content=inject_synergy_context(base_prompt, {"themes": themes.get("themes"), "tone": themes.get("tone"), "setting_requirements": themes.get("setting_requirements")}, "narrative_world"))
         
         human_msg = HumanMessage(content=f"""Build a world for:
 **Concept**: {concept}

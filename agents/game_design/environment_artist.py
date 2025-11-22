@@ -12,6 +12,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from core.state import GameDesignState
 from core.model_factory import create_model
 from core.agent_utils import safe_agent_invoke
+from core.agent_synergies import extract_world_environment_biomes, extract_art_character_style, inject_synergy_context
 from config.settings import settings
 
 logger = structlog.get_logger(__name__)
@@ -33,7 +34,14 @@ async def environment_artist_node(state: GameDesignState) -> GameDesignState:
         world_lore = state.get("world_lore", {})
         art_direction = state.get("art_direction", {})
         
-        system_msg = SystemMessage(content="""You are a **Lead Environment Artist** for games.
+        # SYNERGY 1: Extract biomes from WorldBuilder
+        biomes = extract_world_environment_biomes(world_lore)
+        
+        # SYNERGY 2: Extract art style from ArtDirector
+        art_style_guide = state.get("art_style_guide", {})
+        art_style = extract_art_character_style(art_style_guide)
+        
+        base_prompt = """You are a **Lead Environment Artist** for games.
 
 Design cohesive, immersive environments that support gameplay and narrative.
 
@@ -73,7 +81,12 @@ Output JSON:
     "particles": "Dust motes, fireflies, embers"
   }
 }
-```""")
+```"""
+        
+        # SYNERGY: Inject both world and art context into prompt
+        enhanced_prompt = inject_synergy_context(base_prompt, {"biomes": biomes}, "world_environment")
+        enhanced_prompt = inject_synergy_context(enhanced_prompt, art_style, "art_character")
+        system_msg = SystemMessage(content=enhanced_prompt)
         
         human_msg = HumanMessage(content=f"""Design environment art for:
 **World Lore**: {world_lore}

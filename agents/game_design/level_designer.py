@@ -12,6 +12,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from core.state import GameDesignState
 from core.model_factory import create_model
 from core.agent_utils import safe_agent_invoke
+from core.agent_synergies import extract_narrative_level_beats, inject_synergy_context
 from config.settings import settings
 
 logger = structlog.get_logger(__name__)
@@ -34,7 +35,10 @@ async def level_designer_node(state: GameDesignState) -> GameDesignState:
         narrative = state.get("narrative_structure", {})
         world_lore = state.get("world_lore", {})
         
-        system_msg = SystemMessage(content="""You are a **Lead Level Designer** for games.
+        # SYNERGY: Extract narrative beats from NarrativeArchitect
+        beats = extract_narrative_level_beats(narrative)
+        
+        base_prompt = """You are a **Lead Level Designer** for games.
 
 Design levels that balance challenge, pacing, and narrative integration.
 
@@ -93,7 +97,10 @@ Output JSON:
     "save_system": "Auto-save at checkpoints + manual save"
   }
 }
-```""")
+```"""
+        
+        # SYNERGY: Inject narrative beats into prompt
+        system_msg = SystemMessage(content=inject_synergy_context(base_prompt, {"beats": beats}, "narrative_level"))
         
         human_msg = HumanMessage(content=f"""Design level structure for:
 **Mechanics**: {mechanics}

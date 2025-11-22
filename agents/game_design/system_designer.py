@@ -4,6 +4,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from core.state import GameDesignState
 from core.model_factory import create_model
 from core.agent_utils import safe_agent_invoke
+from core.agent_synergies import extract_mechanics_system_requirements, inject_synergy_context
 from tools.retrieval_tool import RetrievalTool
 from config.settings import settings
 
@@ -25,8 +26,12 @@ async def system_designer_node(state: GameDesignState):
 
         retrieval_tool = RetrievalTool()
         tools = [retrieval_tool.search_engine_docs]
+        
+        # SYNERGY: Extract system requirements from MechanicsDesigner
+        mechanics = state.get("mechanics", [])
+        requirements = extract_mechanics_system_requirements(mechanics)
 
-        system_msg = SystemMessage(content="""You are a **Technical Architect** (formerly System Designer) specializing in Game Engine Architecture.
+        base_prompt = """You are a **Technical Architect** (formerly System Designer) specializing in Game Engine Architecture.
         Your goal is to design the technical foundation of the game, selecting the engine, language, and critical systems.
 
         Consider:
@@ -51,7 +56,10 @@ async def system_designer_node(state: GameDesignState):
                 "Mobile": "Touch controls, battery optimization"
             }
         }
-        """)
+        """
+        
+        # SYNERGY: Inject mechanics requirements into prompt
+        system_msg = SystemMessage(content=inject_synergy_context(base_prompt, requirements, "mechanics_system"))
 
         mechanics_str = str(state.get("mechanics", []))
         platforms = str(state.get("target_platforms", ["PC"]))

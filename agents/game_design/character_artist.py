@@ -12,6 +12,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from core.state import GameDesignState
 from core.model_factory import create_model
 from core.agent_utils import safe_agent_invoke
+from core.agent_synergies import extract_art_character_style, extract_character_visual_specs, inject_synergy_context
 from config.settings import settings
 
 logger = structlog.get_logger(__name__)
@@ -33,7 +34,15 @@ async def character_artist_node(state: GameDesignState) -> GameDesignState:
         characters = state.get("characters", {})
         art_direction = state.get("art_direction", {})
         
-        system_msg = SystemMessage(content="""You are a **Lead Character Artist** for games.
+        # SYNERGY 1: Extract art style from ArtDirector
+        art_style_guide = state.get("art_style_guide", {})
+        art_style = extract_art_character_style(art_style_guide)
+        
+        # SYNERGY 2: Extract character descriptions from CharacterDesigner
+        character_design = state.get("character_design", {})
+        character_specs = extract_character_visual_specs(character_design)
+        
+        base_prompt = """You are a **Lead Character Artist** for games.
 
 Design character visuals that are memorable, readable, and fit the art style.
 
@@ -71,7 +80,12 @@ Output JSON:
     "LOD_levels": 3
   }
 }
-```""")
+```"""
+        
+        # SYNERGY: Inject both art style and character specs into prompt
+        enhanced_prompt = inject_synergy_context(base_prompt, art_style, "art_character")
+        enhanced_prompt = inject_synergy_context(enhanced_prompt, {"characters": character_specs}, "character_art")
+        system_msg = SystemMessage(content=enhanced_prompt)
         
         human_msg = HumanMessage(content=f"""Design character visuals for:
 **Characters**: {characters}

@@ -12,6 +12,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from core.state import GameDesignState
 from core.model_factory import create_model
 from core.agent_utils import safe_agent_invoke
+from core.agent_synergies import extract_mechanics_animation_catalog, inject_synergy_context
 from config.settings import settings
 
 logger = structlog.get_logger(__name__)
@@ -33,7 +34,10 @@ async def animation_director_node(state: GameDesignState) -> GameDesignState:
         mechanics = state.get("mechanics", [])
         character_visuals = state.get("character_visuals", {})
         
-        system_msg = SystemMessage(content="""You are an **Animation Director** for games.
+        # SYNERGY: Extract required animations from MechanicsDesigner
+        animations = extract_mechanics_animation_catalog(mechanics)
+        
+        base_prompt = """You are an **Animation Director** for games.
 
 Design comprehensive animation systems that bring characters and worlds to life.
 
@@ -83,7 +87,10 @@ Output JSON:
     "animation_budget": "Max 200 animations per character"
   }
 }
-```""")
+```"""
+        
+        # SYNERGY: Inject animation requirements into prompt
+        system_msg = SystemMessage(content=inject_synergy_context(base_prompt, {"animations": animations}, "mechanics_animation"))
         
         human_msg = HumanMessage(content=f"""Design animation system for:
 **Mechanics**: {mechanics}

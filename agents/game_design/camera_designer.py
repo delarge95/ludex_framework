@@ -12,6 +12,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from core.state import GameDesignState
 from core.model_factory import create_model
 from core.agent_utils import safe_agent_invoke
+from core.agent_synergies import extract_ui_camera_requirements, inject_synergy_context
 from config.settings import settings
 
 logger = structlog.get_logger(__name__)
@@ -31,9 +32,12 @@ async def camera_designer_node(state: GameDesignState) -> GameDesignState:
         )
         
         mechanics = state.get("mechanics", [])
-        genre = state.get("genre", "Unknown")
+        ui_design = state.get("ui_design", {})
         
-        system_msg = SystemMessage(content="""You are a **Camera Systems Designer** for games.
+        # SYNERGY: Extract camera requirements from UIUXDesigner
+        camera_reqs = extract_ui_camera_requirements(ui_design)
+        
+        base_prompt = """You are a **Camera Systems Designer** for games.
 
 Design camera systems that enhance gameplay and provide cinematic feel.
 
@@ -85,10 +89,12 @@ Output JSON:
     "occlusion_handling": "Transparency or push camera forward"
   }
 }
-```""")
+```"""
+        
+        # SYNERGY: Inject UI requirements into prompt
+        system_msg = SystemMessage(content=inject_synergy_context(base_prompt, camera_reqs, "ui_camera"))
         
         human_msg = HumanMessage(content=f"""Design camera system for:
-**Genre**: {genre}
 **Mechanics**: {mechanics}
 
 Create:
