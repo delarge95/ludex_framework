@@ -194,6 +194,186 @@ def extract_mechanics_animation_catalog(mechanics: List[Dict[str, Any]]) -> List
     return animation_list
 
 
+def extract_narrative_world_themes(narrative_structure: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Extract story themes to inform WorldBuilder.
+    
+    Args:
+        narrative_structure: Output from NarrativeArchitect
+        
+    Returns:
+        Dict with themes, tone, key story elements
+    """
+    if not narrative_structure:
+        return {"themes": ["Adventure"], "tone": "Neutral", "key_elements": []}
+    
+    return {
+        "themes": narrative_structure.get("themes", ["Adventure"]),
+        "tone": narrative_structure.get("tone", "Neutral"),
+        "key_elements": narrative_structure.get("key_story_elements", []),
+        "setting_requirements": narrative_structure.get("setting", "Fantasy")
+    }
+
+
+def extract_world_environment_biomes(world_lore: Dict[str, Any]) -> List[Dict[str, str]]:
+    """
+    Extract biomes for EnvironmentArtist from WorldBuilder.
+    
+    Args:
+        world_lore: Output from WorldBuilder
+        
+    Returns:
+        List of biomes with visual characteristics
+    """
+    if not world_lore:
+        return [{"name": "Forest", "mood": "Peaceful", "colors": "Green, Brown"}]
+    
+    geography = world_lore.get("geography", {})
+    biomes = geography.get("biomes", [])
+    
+    if not biomes:
+        # Fallback: extract from terrain types
+        terrain_types = geography.get("terrain_types", ["Forest"])
+        biomes = [{"name": t, "mood": "Unknown", "colors": "Unknown"} for t in terrain_types]
+    
+    logger.info("extracted_world_environment_biomes", count=len(biomes))
+    return biomes
+
+
+def extract_art_character_style(art_style_guide: Dict[str, Any]) -> Dict[str, str]:
+    """
+    Extract character art requirements from ArtDirector.
+    
+    Args:
+        art_style_guide: Output from ArtDirector
+        
+    Returns:
+        Dict with art style, color palette, proportions
+    """
+    if not art_style_guide:
+        return {"art_style": "Stylized", "color_palette": "Vibrant", "proportions": "Realistic"}
+    
+    return {
+        "art_style": art_style_guide.get("art_style", "Stylized"),
+        "color_palette": art_style_guide.get("color_palette", "Vibrant"),
+        "proportions": art_style_guide.get("character_proportions", "Realistic"),
+        "visual_pillars": art_style_guide.get("visual_pillars", [])
+    }
+
+
+def extract_character_visual_specs(character_design: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """
+    Extract character descriptions for CharacterArtist.
+    
+    Args:
+        character_design: Output from CharacterDesigner
+        
+    Returns:
+        List of characters with visual requirements
+    """
+    if not character_design:
+        return [{"name": "Protagonist", "archetype": "Hero", "traits": []}]
+    
+    characters = character_design.get("characters", [])
+    
+    visual_specs = []
+    for char in characters:
+        visual_specs.append({
+            "name": char.get("name", "Unknown"),
+            "archetype": char.get("archetype", "Generic"),
+            "personality": char.get("personality", ""),
+            "visual_traits": char.get("visual_description", "")
+        })
+    
+    logger.info("extracted_character_visual_specs", count=len(visual_specs))
+    return visual_specs
+
+
+def extract_ui_camera_requirements(ui_design: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Extract HUD/UI requirements that affect camera framing.
+    
+    Args:
+        ui_design: Output from UIUXDesigner
+        
+    Returns:
+        Dict with HUD layout, safe zones, camera constraints
+    """
+    if not ui_design:
+        return {"hud_layout": "Minimalist", "safe_zones": "Standard", "constraints": []}
+    
+    return {
+        "hud_layout": ui_design.get("hud_layout", "Minimalist"),
+        "safe_zones": ui_design.get("safe_zones", "Standard"),
+        "screen_space_usage": ui_design.get("screen_space_percentage", "15%"),
+        "constraints": ui_design.get("camera_constraints", [])
+    }
+
+
+def extract_system_tech_stack(technical_stack: Dict[str, Any]) -> Dict[str, str]:
+    """
+    Extract tech stack for NetworkArchitect and PerformanceAnalyst.
+    
+    Args:
+        technical_stack: Output from SystemDesigner
+        
+    Returns:
+        Dict with engine, platforms, architecture
+    """
+    if not technical_stack:
+        return {"engine": "Unity", "platforms": ["PC"], "architecture": "Client-Server"}
+    
+    return {
+        "engine": technical_stack.get("engine", "Unity"),
+        "platforms": technical_stack.get("target_platforms", ["PC"]),
+        "architecture": technical_stack.get("architecture", "Client-Server"),
+        "middleware": technical_stack.get("middleware", [])
+    }
+
+
+def extract_mechanics_system_requirements(mechanics: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    Extract technical requirements from mechanics for SystemDesigner.
+    
+    Args:
+        mechanics: List of mechanics
+        
+    Returns:
+        Dict with required engine features and complexity
+    """
+    if not mechanics:
+        return {"features": ["Physics"], "complexity": "Medium", "multiplayer": False}
+    
+    features = set()
+    multiplayer_needed = False
+    max_complexity = "Low"
+    
+    for mechanic in mechanics:
+        mechanic_type = mechanic.get("type", "").lower()
+        
+        if "combat" in mechanic_type:
+            features.add("Physics")
+            features.add("Animation System")
+        if "multiplayer" in mechanic_type or "coop" in mechanic_type:
+            multiplayer_needed = True
+            features.add("Networking")
+        if "procedural" in mechanic.get("name", "").lower():
+            features.add("Procedural Generation")
+        
+        # Track complexity
+        complexity = mechanic.get("complexity", "medium")
+        if complexity == "high" or complexity == "very_high":
+            max_complexity = "High"
+        elif complexity == "medium" and max_complexity == "Low":
+            max_complexity = "Medium"
+    
+    return {
+        "features": sorted(list(features)) if features else ["Basic Gameplay"],
+        "complexity": max_complexity,
+        "multiplayer": multiplayer_needed
+    }
+
+
 # ============================================================================
 # INJECTION UTILITIES (Structured Data → Agent Input)
 # ============================================================================
@@ -218,7 +398,7 @@ def inject_synergy_context(
         return base_prompt
     
     synergy_prompts = {
-        "world_physics": f"""
+       "world_physics": f"""
 **World Physics Context (from WorldBuilder)**:
 - Gravity: {synergy_data.get('gravity', 'Unknown')}
 - Atmosphere: {synergy_data.get('atmosphere', 'Unknown')}
@@ -250,6 +430,58 @@ Design levels that align with these narrative beats.
 {', '.join(synergy_data.get('animations', []))}
 
 Create an animation catalog that supports these mechanics.
+""",
+        "narrative_world": f"""
+**Story Themes (from NarrativeArchitect)**:
+- Themes: {', '.join(synergy_data.get('themes', []))}
+- Tone: {synergy_data.get('tone', 'Unknown')}
+- Setting: {synergy_data.get('setting_requirements', 'Unknown')}
+
+Build a world that supports these narrative elements.
+""",
+        "world_environment": f"""
+**World Biomes (from WorldBuilder)**:
+{chr(10).join([f"- {biome.get('name', 'Unknown')}: {biome.get('mood', '')} ({biome.get('colors', '')})" for biome in synergy_data.get('biomes', [])])}
+
+Design environments that match these world specifications.
+""",
+        "art_character": f"""
+**Art Style (from ArtDirector)**:
+- Style: {synergy_data.get('art_style', 'Unknown')}
+- Color Palette: {synergy_data.get('color_palette', 'Unknown')}
+- Proportions: {synergy_data.get('proportions', 'Unknown')}
+
+Design characters that fit this visual direction.
+""",
+        "character_art": f"""
+**Character Specifications (from CharacterDesigner)**:
+{chr(10).join([f"- {char.get('name', 'Unknown')}: {char.get('archetype', '')} - {char.get('visual_traits', '')[:50]}" for char in synergy_data.get('characters', [])])}
+
+Create visual designs for these characters.
+""",
+        "ui_camera": f"""
+**HUD/UI Requirements (from UIUXDesigner)**:
+- HUD Layout: {synergy_data.get('hud_layout', 'Unknown')}
+- Screen Space Used: {synergy_data.get('screen_space_usage', 'Unknown')}
+- Safe Zones: {synergy_data.get('safe_zones', 'Unknown')}
+
+Design camera system that accommodates UI layout.
+""",
+        "system_network": f"""
+**Tech Stack (from SystemDesigner)**:
+- Engine: {synergy_data.get('engine', 'Unknown')}
+- Platforms: {', '.join(synergy_data.get('platforms', []))}
+- Architecture: {synergy_data.get('architecture', 'Unknown')}
+
+Design network architecture compatible with this tech stack.
+""",
+        "mechanics_system": f"""
+**Mechanics Requirements (from MechanicsDesigner)**:
+- Required Features: {', '.join(synergy_data.get('features', []))}
+- Complexity: {synergy_data.get('complexity', 'Unknown')}
+- Multiplayer: {'Yes' if synergy_data.get('multiplayer') else 'No'}
+
+Select tech stack that supports these gameplay needs.
 """
     }
     
@@ -261,6 +493,7 @@ Create an animation catalog that supports these mechanics.
         return enhanced_prompt
     
     return base_prompt
+
 
 
 # ============================================================================
