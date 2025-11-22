@@ -346,17 +346,16 @@ GITHUB_MODEL=gpt-4o
 - [x] **Sprint 1-12**: Foundation (22 agents, RAG engine, UI)
 - [x] **Sprint 18**: Spiral workflow refactoring
 - [x] **Sprint 19**: User Director integration (Decision Gates)
+- [x] **Sprint 20**: Cross-Agent Synergies (12/12 synergies, all agent integrations complete)
 - [x] **Sprint 21**: Deepening (Context, RAG v2, Contracts, User-Agent Synergy)
 
 ### 🔄 In Progress
 
-- [x] **Sprint 20**: Cross-Agent Synergies (Core infrastructure + 3 synergies)
+- [ ] **Sprint 22**: MDA & Psychology Architecture
 
 ### 📋 Planned
 
-- [ ] **Sprint 20**: Complete remaining 12 forward dependencies
-- [ ] **Sprint 20**: Co-creation workflows (Mechanics, Character, Level)
-- [ ] **Sprint 22**: MDA & Psychology Architecture (Reptile Codes, Aesthetics)
+- [ ] **Sprint 20 (Extended)**: Co-creation workflows (Mechanics, Character, Level)
 - [ ] **Sprint 13-17**: Remaining specialized agents (Full 98% GDD coverage)
 
 ---
