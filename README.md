@@ -132,7 +132,26 @@ npm install
 npm run dev
 ```
 
-Access the dashboard at `http://localhost:3000`
+Access the dashboard at `http://localhost:3000`. The new **3-Column Dashboard** provides a comprehensive view of:
+- **Input & Controls**: Director questions, interactive gates, and metrics.
+- **The Studio**: Real-time status of all 24 agents and live activity stream.
+- **Output**: Split-view tabs for **GDD Preview** and **System Logs**.
+
+---
+
+## 🛠️ Development Mode (Mock LLM)
+
+To test the full 24-agent pipeline without incurring API costs or hitting rate limits, use the **Mock LLM** provider.
+
+1. Open the Dashboard (`http://localhost:3000`).
+2. Click the **Settings** icon (top right).
+3. Select **Provider: Mock LLM (Testing)**.
+4. Run a generation (e.g., "Cyberpunk Detective RPG").
+
+The system will simulate agent responses instantly, allowing you to verify:
+- Graph topology and state propagation.
+- Frontend UI updates and WebSocket events.
+- Tool execution flows.
 
 ---
 
