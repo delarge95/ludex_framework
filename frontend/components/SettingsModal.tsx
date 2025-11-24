@@ -46,6 +46,11 @@ const PROVIDERS = {
     name: "Anthropic",
     models: ["claude-3-5-sonnet-20240620", "claude-3-opus-20240229"],
     description: "High quality reasoning. Paid API."
+  },
+  mock: {
+    name: "Mock LLM (Testing)",
+    models: ["mock"],
+    description: "Instant responses for UI testing. No API calls."
   }
 };
 

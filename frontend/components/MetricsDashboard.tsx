@@ -16,9 +16,10 @@ interface MetricsData {
 
 interface MetricsDashboardProps {
   metrics: MetricsData | null;
+  compact?: boolean;
 }
 
-export function MetricsDashboard({ metrics }: MetricsDashboardProps) {
+export function MetricsDashboard({ metrics, compact = false }: MetricsDashboardProps) {
   if (!metrics || metrics.total_executions === 0) return null;
 
   // Provide safe defaults for all metrics
@@ -34,7 +35,7 @@ export function MetricsDashboard({ metrics }: MetricsDashboardProps) {
 
   const stats = [
     {
-      title: "Total Executions",
+      title: "Executions",
       value: safeMetrics.total_executions,
       icon: Activity,
       color: "text-blue-600"
@@ -46,20 +47,42 @@ export function MetricsDashboard({ metrics }: MetricsDashboardProps) {
       color: "text-green-600"
     },
     {
-      title: "Total Tokens",
+      title: "Tokens",
       value: safeMetrics.total_tokens.toLocaleString(),
       icon: Zap,
       color: "text-amber-600"
     },
     {
-      title: "Success Rate",
+      title: "Success",
       value: safeMetrics.total_executions > 0 
-        ? `${((safeMetrics.completed / safeMetrics.total_executions) * 100).toFixed(1)}%`
+        ? `${((safeMetrics.completed / safeMetrics.total_executions) * 100).toFixed(0)}%`
         : "0%",
       icon: TrendingUp,
       color: "text-emerald-600"
     }
   ];
+
+  if (compact) {
+    return (
+      <div className="grid grid-cols-2 gap-2">
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <div 
+              key={stat.title}
+              className="flex flex-col p-2 rounded border bg-card/50"
+            >
+              <div className="flex items-center gap-1.5 mb-1">
+                <Icon className={`h-3 w-3 ${stat.color}`} />
+                <span className="text-[10px] text-muted-foreground uppercase">{stat.title}</span>
+              </div>
+              <p className="text-lg font-bold leading-none">{stat.value}</p>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
 
   return (
     <Card>

@@ -16,62 +16,41 @@ export interface Agent {
 
 interface AgentStatusProps {
   agents: Agent[];
+  compact?: boolean;
 }
 
-export function AgentStatus({ agents }: AgentStatusProps) {
-  const getStatusIcon = (status: AgentState) => {
-    switch (status) {
-      case 'working':
-        return <Loader2 className="h-4 w-4 animate-spin text-blue-500" />;
-      case 'done':
-        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
-      case 'error':
-        return <Brain className="h-4 w-4 text-red-500" />;
-      default:
-        return <CircleDashed className="h-4 w-4 text-gray-300" />;
-    }
-  };
-
-  const getStatusColor = (status: AgentState) => {
-    switch (status) {
-      case 'working':
-        return "border-blue-500 bg-blue-50";
-      case 'done':
-        return "border-green-500 bg-green-50";
-      case 'error':
-        return "border-red-500 bg-red-50";
-      default:
-        return "border-gray-200";
-    }
-  };
-
+export function AgentStatus({ agents, compact = false }: AgentStatusProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold flex items-center gap-2">
-          <Brain className="h-5 w-5" />
-          The Studio
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="grid gap-4">
-        {agents.map((agent) => (
-          <div
-            key={agent.id}
-            className={`flex items-center justify-between p-3 rounded-lg border ${getStatusColor(agent.status)} transition-all duration-300`}
-          >
-            <div className="flex items-center gap-3">
-              {getStatusIcon(agent.status)}
-              <div>
-                <p className="font-medium text-sm">{agent.name}</p>
-                <p className="text-xs text-gray-500">{agent.role}</p>
-              </div>
+    <div className={`grid gap-2 ${compact ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
+      {agents.map((agent) => (
+        <div 
+          key={agent.id} 
+          className={`flex items-center justify-between p-2 rounded-lg border bg-card text-card-foreground shadow-sm ${compact ? 'py-1.5 px-3' : 'p-3'}`}
+        >
+          <div className="flex items-center gap-3">
+            <div className={`flex items-center justify-center rounded-full ${compact ? 'w-6 h-6' : 'w-8 h-8'} ${
+              agent.status === 'working' ? 'bg-blue-100 text-blue-600 animate-pulse' :
+              agent.status === 'done' ? 'bg-green-100 text-green-600' :
+              'bg-muted text-muted-foreground'
+            }`}>
+              {agent.status === 'working' ? <Loader2 className={compact ? "h-3 w-3 animate-spin" : "h-4 w-4 animate-spin"} /> :
+               agent.status === 'done' ? <CheckCircle2 className={compact ? "h-3 w-3" : "h-4 w-4"} /> :
+               <Brain className={compact ? "h-3 w-3" : "h-4 w-4"} />}
             </div>
-            <Badge variant={agent.status === 'working' ? 'default' : 'secondary'}>
-              {agent.status}
-            </Badge>
+            <div>
+              <p className={`font-medium leading-none ${compact ? 'text-xs' : 'text-sm'}`}>{agent.name}</p>
+              {!compact && <p className="text-xs text-muted-foreground">{agent.role}</p>}
+            </div>
           </div>
-        ))}
-      </CardContent>
-    </Card>
+          <Badge variant={
+            agent.status === 'working' ? "default" :
+            agent.status === 'done' ? "secondary" :
+            "outline"
+          } className={compact ? "text-[10px] px-1 py-0 h-5" : ""}>
+            {agent.status}
+          </Badge>
+        </div>
+      ))}
+    </div>
   );
 }

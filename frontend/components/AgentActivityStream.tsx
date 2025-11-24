@@ -26,9 +26,10 @@ export interface WebSocketMessage {
 
 interface AgentActivityStreamProps {
   lastMessage: WebSocketMessage | null;
+  compact?: boolean;
 }
 
-export function AgentActivityStream({ lastMessage }: AgentActivityStreamProps) {
+export function AgentActivityStream({ lastMessage, compact = false }: AgentActivityStreamProps) {
   const [activities, setActivities] = useState<ToolCall[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -76,6 +77,34 @@ export function AgentActivityStream({ lastMessage }: AgentActivityStreamProps) {
       }
     }
   }, [activities]);
+
+  if (compact) {
+    return (
+      <ScrollArea className="h-full w-full p-2" ref={scrollRef}>
+        <div className="space-y-2">
+           {activities.length === 0 && (
+              <div className="text-center text-muted-foreground text-xs py-4">
+                Waiting for activity...
+              </div>
+            )}
+            {activities.map((activity) => (
+              <div key={activity.id} className="text-xs border-l-2 border-muted pl-2 relative">
+                 <div className={`absolute -left-[3px] top-1 w-1.5 h-1.5 rounded-full ${
+                    activity.status === 'running' ? 'bg-blue-500 animate-pulse' : 'bg-green-500'
+                  }`} />
+                  <div className="flex items-center gap-1 mb-0.5">
+                    <span className="font-bold text-primary truncate max-w-[80px]">{activity.agent}</span>
+                    <span className="text-muted-foreground">→</span>
+                    <span className="font-mono text-muted-foreground truncate">{activity.tool}</span>
+                  </div>
+                  {activity.status === 'running' && <span className="text-blue-500 italic text-[10px]">Running...</span>}
+                  {activity.status === 'completed' && <span className="text-green-600 text-[10px]">✓ Done</span>}
+              </div>
+            ))}
+        </div>
+      </ScrollArea>
+    );
+  }
 
   return (
     <Card className="h-[400px] flex flex-col w-full">
